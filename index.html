@@ -40,6 +40,7 @@
                         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                         'glow': 'glow 1.5s infinite alternate',
                         'gradient-text': 'gradient-text 5s ease infinite',
+                        'count': 'count 1s ease-out',
                     },
                     keyframes: {
                         fadeIn: {
@@ -154,6 +155,7 @@
             font-weight: 700;
             animation: gradient-text 5s ease infinite;
         }
+        
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -236,7 +238,7 @@
                 </div>
             </div>
 
-            <!-- Right Column - Countdown -->
+            <!-- Right Column - Countdown & Download Counter -->
             <div class="space-y-6">
                 <div class="countdown-card text-white rounded-2xl shadow-xl overflow-hidden animate__animated animate__fadeInRight">
                     <div class="px-6 py-5 bg-blue-800 bg-opacity-50 flex items-center">
@@ -269,25 +271,39 @@
                     </div>
                 </div>
 
-                <!-- Syllabus Download Card -->
+                <!-- Syllabus Download Counter Card -->
                 <div class="glass-card rounded-2xl shadow-lg overflow-hidden animate__animated animate__fadeInRight animate__delay-1s">
                     <div class="bg-gradient-to-r from-indigo-600 to-indigo-500 text-white px-6 py-5 flex items-center">
-                        <i class="fas fa-book-open text-xl mr-3"></i>
-                        <h3 class="text-xl font-bold">পরীক্ষার সিলেবাস</h3>
+                        <i class="fas fa-chart-line text-xl mr-3"></i>
+                        <h3 class="text-xl font-bold">মোট ডাউনলোড</h3>
                     </div>
                     <div class="p-6 text-center">
-                        <div class="w-20 h-20 mx-auto mb-5 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600">
-                            <i class="fas fa-file-pdf text-3xl"></i>
-                        </div>
-                        <p class="text-gray-600 mb-6">১ম সাময়িক পরীক্ষার সম্পূর্ণ সিলেবাস ডাউনলোড করুন</p>
-                        <button id="open-syllabus-btn" class="download-btn text-white font-bold py-3 px-8 rounded-lg inline-flex items-center shadow-lg hover:shadow-xl">
-                            <i class="fas fa-download mr-2"></i>
-                            সিলেবাস ডাউনলোড
-                        </button>
+                         <p class="text-gray-600 mb-2">এই সিলেবাসটি মোট ডাউনলোড হয়েছে:</p>
+                         <div id="total-download-counter" class="relative inline-block text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-indigo-600 animate-gradient-text drop-shadow-md">0</div>
+                         <p class="text-sm text-gray-500 mt-2">রিফ্রেশ করলে সংখ্যাটি আপডেট হবে।</p>
                     </div>
                 </div>
             </div>
         </div>
+        
+        <!-- Syllabus Download Card (Moved to left) -->
+        <div class="glass-card rounded-2xl shadow-lg overflow-hidden animate__animated animate__fadeInLeft">
+            <div class="bg-gradient-to-r from-indigo-600 to-indigo-500 text-white px-6 py-5 flex items-center">
+                <i class="fas fa-book-open text-xl mr-3"></i>
+                <h3 class="text-xl font-bold">পরীক্ষার সিলেবাস</h3>
+            </div>
+            <div class="p-6 text-center">
+                <div class="w-20 h-20 mx-auto mb-5 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600">
+                    <i class="fas fa-file-pdf text-3xl"></i>
+                </div>
+                <p class="text-gray-600 mb-6">১ম সাময়িক পরীক্ষার সম্পূর্ণ সিলেবাস ডাউনলোড করুন</p>
+                <button id="open-syllabus-btn" class="download-btn text-white font-bold py-3 px-8 rounded-lg inline-flex items-center shadow-lg hover:shadow-xl">
+                    <i class="fas fa-download mr-2"></i>
+                    সিলেবাস ডাউনলোড
+                </button>
+            </div>
+        </div>
+
     </main>
 
     <!-- Floating Action Button (Mobile) -->
@@ -334,7 +350,7 @@
                     </button>
                 </div>
                 
-                <div id="download-section" class="hidden text-center pt-4">
+                <div id="download-status-section" class="hidden text-center pt-4">
                     <div class="mb-6 p-4 bg-green-50 rounded-lg border border-green-200 animate__animated animate__fadeIn">
                         <div class="w-16 h-16 mx-auto mb-3 bg-green-100 rounded-full flex items-center justify-center text-green-600">
                             <i class="fas fa-check text-2xl"></i>
@@ -342,8 +358,9 @@
                         <p class="font-bold text-green-800">ধন্যবাদ!</p>
                         <p id="student-info" class="mt-1 text-gray-700"></p>
                     </div>
-                    
-                    <div id="download-ready" class="hidden animate__animated animate__fadeIn">
+
+                    <!-- Download Ready & Counter Section -->
+                    <div id="download-ready-and-counter" class="hidden animate__animated animate__zoomIn">
                         <p class="mb-4 text-gray-700 font-bold">এখন ডাউনলোড করতে পারেন, লিংক যুক্ত করা হয়েছে।</p>
                         <a id="download-link" href="#" class="download-btn text-white font-bold py-3 px-8 rounded-lg inline-flex items-center justify-center shadow-lg hover:shadow-xl">
                             <i class="fas fa-file-download mr-2"></i>
@@ -351,10 +368,11 @@
                         </a>
                     </div>
                     
-                    <div id="no-link-message" class="p-4 bg-yellow-50 text-yellow-800 rounded-lg border border-yellow-200 animate__animated animate__fadeIn">
+                    <!-- No Link Message Section -->
+                    <div id="no-link-message" class="hidden p-4 bg-yellow-50 text-yellow-800 rounded-lg border border-yellow-200 animate__animated animate__fadeIn">
                         <div class="flex items-center justify-center">
                             <i class="fas fa-exclamation-triangle mr-2"></i>
-                            <p>ড্রাইভ লিংক এখনো যুক্ত করা হয়নি। খুব শীঘ্রই যুক্ত করা হবে।</p>
+                            <p>ড্রাইভ লিংক এখনো যুক্ত করা হয়নি। দয়া করে কিছুক্ষণ পর আবার চেষ্টা করুন।</p>
                         </div>
                     </div>
                 </div>
@@ -429,16 +447,19 @@
         const modalContainer = document.getElementById('modal-container');
         const closeSyllabusBtn = document.getElementById('close-syllabus-btn');
         const downloadForm = document.getElementById('download-form');
-        const downloadSection = document.getElementById('download-section');
+        const downloadStatusSection = document.getElementById('download-status-section');
         const studentNameInput = document.getElementById('student-name');
         const rollNumberInput = document.getElementById('roll-number');
         const submitBtn = document.getElementById('submit-btn');
         const submitText = document.getElementById('submit-text');
         const submitSpinner = document.getElementById('submit-spinner');
         const studentInfo = document.getElementById('student-info');
-        const downloadReady = document.getElementById('download-ready');
+
+        const downloadReadyAndCounter = document.getElementById('download-ready-and-counter');
+        const totalDownloadCounterDisplay = document.getElementById('total-download-counter');
         const downloadLink = document.getElementById('download-link');
         const noLinkMessage = document.getElementById('no-link-message');
+
         const toast = document.getElementById('toast');
         const toastIcon = document.getElementById('toast-icon');
         const toastMessage = document.getElementById('toast-message');
@@ -472,6 +493,16 @@
                     currentNotice = null;
                     hideNotice();
                 }
+            });
+
+            // Load and animate total downloads from Firestore on page load
+            db.collection("downloadStats").onSnapshot(snapshot => {
+                let totalCount = 0;
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    totalCount += data.downloadCount || 1;
+                });
+                animateCounter(totalDownloadCounterDisplay, 0, totalCount, 1500);
             });
             
             // Start countdown timer
@@ -597,7 +628,7 @@
             
             // Reset form
             downloadForm.classList.remove('hidden');
-            downloadSection.classList.add('hidden');
+            downloadStatusSection.classList.add('hidden');
             studentNameInput.value = '';
             rollNumberInput.value = '';
             studentNameInput.focus();
@@ -629,6 +660,20 @@
             }, 3000);
         }
 
+        // Animate the counter
+        function animateCounter(obj, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                obj.textContent = Math.floor(progress * (end - start) + start);
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
         // Handle download form submission
         async function handleDownloadSubmit() {
             const name = studentNameInput.value.trim();
@@ -645,27 +690,44 @@
             submitBtn.disabled = true;
             
             try {
-                // Save download record to Firestore
-                await db.collection("downloadStats").add({
-                    name,
-                    roll,
-                    firstDownload: new Date().toISOString(),
-                    lastDownload: new Date().toISOString(),
-                    downloadCount: 1
-                });
-                
-                // Show download section
+                // Check if user exists, if so, increment count. Otherwise, create new entry.
+                const downloadStatsRef = db.collection("downloadStats");
+                const snapshot = await downloadStatsRef.where("roll", "==", roll).get();
+                let downloadCount = 0;
+
+                if (!snapshot.empty) {
+                    const doc = snapshot.docs[0];
+                    const data = doc.data();
+                    downloadCount = (data.downloadCount || 0) + 1;
+                    await downloadStatsRef.doc(doc.id).update({
+                        name,
+                        roll,
+                        lastDownload: new Date().toISOString(),
+                        downloadCount
+                    });
+                } else {
+                    downloadCount = 1;
+                    await downloadStatsRef.add({
+                        name,
+                        roll,
+                        firstDownload: new Date().toISOString(),
+                        lastDownload: new Date().toISOString(),
+                        downloadCount
+                    });
+                }
+
+                // Show download status section
                 studentInfo.textContent = `${name} (রোল: ${roll})`;
                 downloadForm.classList.add('hidden');
-                downloadSection.classList.remove('hidden');
+                downloadStatusSection.classList.remove('hidden');
                 
-                // Update download link if available
+                // Update UI based on drive link availability
                 if (currentDriveLink && currentDriveLink.trim() !== '') {
                     downloadLink.href = currentDriveLink;
-                    downloadReady.classList.remove('hidden');
+                    downloadReadyAndCounter.classList.remove('hidden');
                     noLinkMessage.classList.add('hidden');
                 } else {
-                    downloadReady.classList.add('hidden');
+                    downloadReadyAndCounter.classList.add('hidden');
                     noLinkMessage.classList.remove('hidden');
                 }
             } catch (error) {
