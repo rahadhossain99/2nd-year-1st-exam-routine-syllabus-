@@ -6,12 +6,61 @@
     <title>পরীক্ষার রুটিন ও সিলেবাস</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        },
+                        secondary: {
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                        },
+                        success: {
+                            500: '#10b981',
+                            600: '#059669',
+                        },
+                        danger: {
+                            500: '#ef4444',
+                            600: '#dc2626',
+                        }
+                    },
+                    fontFamily: {
+                        'bengali': ['"Noto Sans Bengali"', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Animate.css -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <style>
@@ -19,22 +68,31 @@
             font-family: 'Noto Sans Bengali', sans-serif;
             background-color: #f8fafc;
         }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
         .exam-card {
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
         .exam-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
         .countdown-card {
             background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
         }
         .download-btn {
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .download-btn:hover {
             background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
         }
         .modal-overlay {
             background: rgba(0, 0, 0, 0.5);
@@ -42,6 +100,10 @@
         }
         .floating-btn {
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .floating-btn:hover {
+            transform: scale(1.1) rotate(5deg);
         }
         .input-field {
             transition: all 0.3s ease;
@@ -56,17 +118,43 @@
             font-weight: 500;
             white-space: nowrap;
         }
+        .notice-badge {
+            animation: pulse-slow 2s infinite;
+        }
+        #toast {
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
     </style>
 </head>
 <body class="min-h-screen">
+    <!-- Notice Banner (if exists) -->
+    <div id="notice-banner" class="hidden bg-red-600 text-white py-3 px-4">
+        <div class="container mx-auto flex items-center justify-between">
+            <div class="flex items-center">
+                <i class="fas fa-bullhorn mr-3"></i>
+                <p id="notice-text"></p>
+            </div>
+            <button id="close-notice-btn" class="text-white hover:text-red-200 ml-4">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
     <!-- Header -->
-    <header class="bg-gradient-to-r from-blue-700 to-blue-600 text-white py-6 px-4 shadow-lg">
+    <header class="bg-gradient-to-r from-blue-700 to-blue-600 text-white py-8 px-4 shadow-lg">
         <div class="container mx-auto">
             <div class="flex flex-col items-center text-center">
-                <h1 class="text-2xl md:text-3xl font-bold mb-1 animate__animated animate__fadeInDown">সরকারি শহীদ সিরাজুদ্দীন হোসেন মহাবিদ্যালয়</h1>
-                <p class="text-blue-100 mb-4 animate__animated animate__fadeInDown animate__delay-1s">খাজুরা, বাঘারপাড়া, যশোর</p>
-                <div class="bg-white text-blue-700 font-bold py-2 px-6 rounded-full inline-block animate__animated animate__zoomIn animate__delay-2s">
-                    <h2 class="text-lg md:text-xl">দ্বাদশ শ্রেণির ১ম সাময়িক পরীক্ষা</h2>
+                <div class="mb-4 animate__animated animate__fadeInDown">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-blue-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path d="M12 14l9-5-9-5-9 5 9 5z" />
+                        <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
+                    </svg>
+                </div>
+                <h1 class="text-3xl md:text-4xl font-bold mb-2 animate__animated animate__fadeInDown">সরকারি শহীদ সিরাজুদ্দীন হোসেন মহাবিদ্যালয়</h1>
+                <p class="text-blue-100 mb-6 animate__animated animate__fadeInDown animate__delay-1s">খাজুরা, বাঘারপাড়া, যশোর</p>
+                <div class="bg-white text-blue-700 font-bold py-3 px-8 rounded-full inline-block animate__animated animate__zoomIn animate__delay-2s shadow-lg">
+                    <h2 class="text-xl md:text-2xl">দ্বাদশ শ্রেণির ১ম সাময়িক পরীক্ষা</h2>
                 </div>
             </div>
         </div>
@@ -77,24 +165,39 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Left Column - Exam Routine -->
             <div class="lg:col-span-2 space-y-6">
-                <div class="bg-white rounded-xl shadow-md overflow-hidden animate__animated animate__fadeInLeft">
-                    <div class="bg-blue-600 text-white px-6 py-4">
+                <!-- Notice Card (if exists) -->
+                <div id="notice-card" class="hidden bg-red-100 border-l-4 border-red-600 p-4 rounded-r-lg animate__animated animate__fadeIn">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 text-red-600 mr-3">
+                            <i class="fas fa-exclamation-circle text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-red-800 mb-1">গুরুত্বপূর্ণ নোটিশ</h3>
+                            <p id="notice-card-text" class="text-red-700"></p>
+                            <p id="notice-card-time" class="text-xs text-red-500 mt-2"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-2xl shadow-lg overflow-hidden animate__animated animate__fadeInLeft">
+                    <div class="bg-gradient-to-r from-blue-600 to-blue-500 text-white px-6 py-5 flex items-center">
+                        <i class="fas fa-calendar-alt text-xl mr-3"></i>
                         <h3 class="text-xl font-bold">পরীক্ষার সময়সূচি</h3>
                     </div>
                     <div class="p-4 md:p-6">
                         <div class="space-y-4">
-                            <div id="routine-body" class="space-y-3">
+                            <div id="routine-body" class="space-y-4">
                                 <!-- Exams will be loaded here -->
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl shadow-lg p-5 animate__animated animate__fadeInLeft animate__delay-1s">
+                <div class="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-2xl shadow-lg p-6 animate__animated animate__fadeInLeft animate__delay-1s">
                     <div class="flex items-start">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
+                        <div class="bg-white bg-opacity-20 p-3 rounded-full mr-4">
+                            <i class="fas fa-award text-xl"></i>
+                        </div>
                         <div>
                             <p class="font-bold">ফলাফল প্রকাশ:</p>
                             <p id="result-date-text" class="text-green-100">২৫ সেপ্টেম্বর ২০২৫, বৃহস্পতিবার সকাল ১০:০০ টায়</p>
@@ -105,49 +208,50 @@
 
             <!-- Right Column - Countdown -->
             <div class="space-y-6">
-                <div class="countdown-card text-white rounded-xl shadow-lg overflow-hidden animate__animated animate__fadeInRight">
-                    <div class="px-6 py-4 bg-blue-800 bg-opacity-50">
+                <div class="countdown-card text-white rounded-2xl shadow-xl overflow-hidden animate__animated animate__fadeInRight">
+                    <div class="px-6 py-5 bg-blue-800 bg-opacity-50 flex items-center">
+                        <i class="fas fa-clock text-xl mr-3"></i>
                         <h3 id="countdown-title" class="text-xl font-bold">পরীক্ষার বাকি সময়</h3>
                     </div>
-                    <div class="p-5">
+                    <div class="p-6">
                         <div id="countdown-container" class="grid grid-cols-2 gap-4">
-                            <div class="bg-blue-800 bg-opacity-30 rounded-lg p-4 text-center backdrop-blur-sm">
-                                <div id="days" class="text-3xl font-bold">00</div>
-                                <div class="text-sm opacity-90">দিন</div>
+                            <div class="bg-blue-800 bg-opacity-30 rounded-xl p-4 text-center backdrop-blur-sm">
+                                <div id="days" class="text-4xl font-bold">00</div>
+                                <div class="text-sm opacity-90 mt-1">দিন</div>
                             </div>
-                            <div class="bg-blue-800 bg-opacity-30 rounded-lg p-4 text-center backdrop-blur-sm">
-                                <div id="hours" class="text-3xl font-bold">00</div>
-                                <div class="text-sm opacity-90">ঘন্টা</div>
+                            <div class="bg-blue-800 bg-opacity-30 rounded-xl p-4 text-center backdrop-blur-sm">
+                                <div id="hours" class="text-4xl font-bold">00</div>
+                                <div class="text-sm opacity-90 mt-1">ঘন্টা</div>
                             </div>
-                            <div class="bg-blue-800 bg-opacity-30 rounded-lg p-4 text-center backdrop-blur-sm">
-                                <div id="minutes" class="text-3xl font-bold">00</div>
-                                <div class="text-sm opacity-90">মিনিট</div>
+                            <div class="bg-blue-800 bg-opacity-30 rounded-xl p-4 text-center backdrop-blur-sm">
+                                <div id="minutes" class="text-4xl font-bold">00</div>
+                                <div class="text-sm opacity-90 mt-1">মিনিট</div>
                             </div>
-                            <div class="bg-blue-800 bg-opacity-30 rounded-lg p-4 text-center backdrop-blur-sm">
-                                <div id="seconds" class="text-3xl font-bold">00</div>
-                                <div class="text-sm opacity-90">সেকেন্ড</div>
+                            <div class="bg-blue-800 bg-opacity-30 rounded-xl p-4 text-center backdrop-blur-sm">
+                                <div id="seconds" class="text-4xl font-bold">00</div>
+                                <div class="text-sm opacity-90 mt-1">সেকেন্ড</div>
                             </div>
                         </div>
-                        <div id="final-message" class="hidden mt-4 text-center text-lg font-bold animate__animated animate__bounceIn">
-                            সকল পরীক্ষা সম্পন্ন হয়েছে!
+                        <div id="final-message" class="hidden mt-6 text-center text-xl font-bold animate__animated animate__bounceIn">
+                            <i class="fas fa-check-circle text-3xl text-green-300 mb-2"></i>
+                            <p>সকল পরীক্ষা সম্পন্ন হয়েছে!</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Syllabus Download Card -->
-                <div class="bg-white rounded-xl shadow-md overflow-hidden animate__animated animate__fadeInRight animate__delay-1s">
-                    <div class="bg-indigo-600 text-white px-6 py-4">
+                <div class="glass-card rounded-2xl shadow-lg overflow-hidden animate__animated animate__fadeInRight animate__delay-1s">
+                    <div class="bg-gradient-to-r from-indigo-600 to-indigo-500 text-white px-6 py-5 flex items-center">
+                        <i class="fas fa-book-open text-xl mr-3"></i>
                         <h3 class="text-xl font-bold">পরীক্ষার সিলেবাস</h3>
                     </div>
                     <div class="p-6 text-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-indigo-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        <p class="text-gray-600 mb-5">১ম সাময়িক পরীক্ষার সম্পূর্ণ সিলেবাস ডাউনলোড করুন</p>
-                        <button id="open-syllabus-btn" class="download-btn text-white font-bold py-3 px-8 rounded-lg inline-flex items-center transition-transform transform hover:scale-105">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                            </svg>
+                        <div class="w-20 h-20 mx-auto mb-5 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600">
+                            <i class="fas fa-file-pdf text-3xl"></i>
+                        </div>
+                        <p class="text-gray-600 mb-6">১ম সাময়িক পরীক্ষার সম্পূর্ণ সিলেবাস ডাউনলোড করুন</p>
+                        <button id="open-syllabus-btn" class="download-btn text-white font-bold py-3 px-8 rounded-lg inline-flex items-center shadow-lg hover:shadow-xl">
+                            <i class="fas fa-download mr-2"></i>
                             সিলেবাস ডাউনলোড
                         </button>
                     </div>
@@ -158,10 +262,8 @@
 
     <!-- Floating Action Button (Mobile) -->
     <div class="fixed bottom-6 right-6 lg:hidden z-50">
-        <button id="mobile-download-btn" class="floating-btn bg-indigo-600 text-white p-4 rounded-full shadow-lg transition-transform transform hover:scale-110">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            </svg>
+        <button id="mobile-download-btn" class="floating-btn bg-gradient-to-r from-indigo-600 to-indigo-500 text-white p-5 rounded-full shadow-xl">
+            <i class="fas fa-download text-xl"></i>
         </button>
     </div>
 
@@ -169,22 +271,31 @@
     <div id="syllabus-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
         <div id="modal-overlay" class="fixed inset-0 bg-black bg-opacity-50 modal-overlay animate__animated animate__fadeIn"></div>
         
-        <div id="modal-container" class="bg-white rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto z-10 animate__animated animate__zoomIn">
-            <div class="sticky top-0 bg-indigo-600 text-white p-4 flex justify-between items-center">
-                <h3 class="text-xl font-bold">সিলেবাস ডাউনলোড</h3>
+        <div id="modal-container" class="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto z-10 animate__animated animate__zoomIn">
+            <div class="sticky top-0 bg-gradient-to-r from-indigo-600 to-indigo-500 text-white p-5 flex justify-between items-center">
+                <h3 class="text-xl font-bold flex items-center">
+                    <i class="fas fa-file-download mr-2"></i>
+                    সিলেবাস ডাউনলোড
+                </h3>
                 <button id="close-syllabus-btn" class="text-white hover:text-indigo-200 text-2xl font-bold">&times;</button>
             </div>
             <div class="p-6">
                 <div id="download-form">
                     <div class="mb-5">
-                        <label for="student-name" class="block text-gray-700 font-medium mb-2">আপনার নাম</label>
-                        <input type="text" id="student-name" class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" placeholder="আপনার পুরো নাম লিখুন">
+                        <label for="student-name" class="block text-gray-700 font-medium mb-2 flex items-center">
+                            <i class="fas fa-user text-gray-400 mr-2"></i>
+                            আপনার নাম
+                        </label>
+                        <input type="text" id="student-name" class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="আপনার পুরো নাম লিখুন">
                     </div>
                     <div class="mb-6">
-                        <label for="roll-number" class="block text-gray-700 font-medium mb-2">রোল নম্বর</label>
-                        <input type="text" id="roll-number" class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" placeholder="আপনার রোল নম্বর লিখুন">
+                        <label for="roll-number" class="block text-gray-700 font-medium mb-2 flex items-center">
+                            <i class="fas fa-id-card text-gray-400 mr-2"></i>
+                            রোল নম্বর
+                        </label>
+                        <input type="text" id="roll-number" class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="আপনার রোল নম্বর লিখুন" inputmode="numeric">
                     </div>
-                    <button id="submit-btn" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center">
+                    <button id="submit-btn" class="w-full bg-gradient-to-r from-blue-600 to-blue-500 text-white font-bold py-3 px-4 rounded-lg hover:from-blue-700 hover:to-blue-600 transition-all duration-300 flex items-center justify-center shadow-md hover:shadow-lg">
                         <span id="submit-text">সাবমিট করুন</span>
                         <svg id="submit-spinner" class="hidden animate-spin ml-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -194,33 +305,37 @@
                 </div>
                 
                 <div id="download-section" class="hidden text-center pt-4">
-                    <div class="mb-6 p-4 bg-green-100 text-green-800 rounded-lg border border-green-200">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-green-500 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <p class="font-bold">ধন্যবাদ!</p>
-                        <p id="student-info" class="mt-1"></p>
+                    <div class="mb-6 p-4 bg-green-50 rounded-lg border border-green-200 animate__animated animate__fadeIn">
+                        <div class="w-16 h-16 mx-auto mb-3 bg-green-100 rounded-full flex items-center justify-center text-green-600">
+                            <i class="fas fa-check text-2xl"></i>
+                        </div>
+                        <p class="font-bold text-green-800">ধন্যবাদ!</p>
+                        <p id="student-info" class="mt-1 text-gray-700"></p>
                     </div>
                     
-                    <div id="download-ready" class="hidden">
+                    <div id="download-ready" class="hidden animate__animated animate__fadeIn">
                         <p class="mb-4 text-gray-700">নিচের বাটনে ক্লিক করে সিলেবাস ডাউনলোড করুন:</p>
-                        <a id="download-link" href="#" class="download-btn text-white font-bold py-3 px-8 rounded-lg inline-flex items-center justify-center transition-transform transform hover:scale-105 shadow-lg">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                            </svg>
+                        <a id="download-link" href="#" class="download-btn text-white font-bold py-3 px-8 rounded-lg inline-flex items-center justify-center shadow-lg hover:shadow-xl">
+                            <i class="fas fa-file-download mr-2"></i>
                             ডাউনলোড করুন
                         </a>
                     </div>
                     
-                    <div id="no-link-message" class="p-4 bg-yellow-100 text-yellow-800 rounded-lg border border-yellow-200">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                        </svg>
-                        ড্রাইভ লিংক এখনো যুক্ত করা হয়নি। দয়া করে কিছুক্ষণ পর আবার চেষ্টা করুন।
+                    <div id="no-link-message" class="p-4 bg-yellow-50 text-yellow-800 rounded-lg border border-yellow-200 animate__animated animate__fadeIn">
+                        <div class="flex items-center justify-center">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                            <p>ড্রাইভ লিংক এখনো যুক্ত করা হয়নি। দয়া করে কিছুক্ষণ পর আবার চেষ্টা করুন।</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-xl flex items-center transform translate-y-10 opacity-0 z-50">
+        <i id="toast-icon" class="fas fa-check-circle mr-3"></i>
+        <p id="toast-message"></p>
     </div>
 
     <!-- Firebase Initialization -->
@@ -256,6 +371,12 @@
         const EXAM_DURATION_HOURS = 3;
 
         // --- DOM ELEMENTS ---
+        const noticeBanner = document.getElementById('notice-banner');
+        const noticeText = document.getElementById('notice-text');
+        const closeNoticeBtn = document.getElementById('close-notice-btn');
+        const noticeCard = document.getElementById('notice-card');
+        const noticeCardText = document.getElementById('notice-card-text');
+        const noticeCardTime = document.getElementById('notice-card-time');
         const routineBody = document.getElementById('routine-body');
         const countdownTitle = document.getElementById('countdown-title');
         const daysEl = document.getElementById('days');
@@ -281,9 +402,13 @@
         const downloadReady = document.getElementById('download-ready');
         const downloadLink = document.getElementById('download-link');
         const noLinkMessage = document.getElementById('no-link-message');
+        const toast = document.getElementById('toast');
+        const toastIcon = document.getElementById('toast-icon');
+        const toastMessage = document.getElementById('toast-message');
 
         // --- STATE VARIABLES ---
         let currentDriveLink = null;
+        let currentNotice = null;
 
         // --- FUNCTIONS ---
         
@@ -301,8 +426,42 @@
                 }
             });
             
+            // Load notice from Firestore
+            db.collection("settings").doc("notice").onSnapshot(doc => {
+                if (doc.exists && doc.data().text) {
+                    currentNotice = doc.data();
+                    showNotice(currentNotice);
+                } else {
+                    currentNotice = null;
+                    hideNotice();
+                }
+            });
+            
             // Start countdown timer
             setInterval(updateStatus, 1000);
+        }
+
+        // Show notice
+        function showNotice(notice) {
+            noticeText.textContent = notice.text;
+            noticeCardText.textContent = notice.text;
+            noticeCardTime.textContent = new Date(notice.timestamp).toLocaleString('bn-BD', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+                hour: 'numeric',
+                minute: 'numeric',
+                hour12: true
+            });
+            
+            noticeBanner.classList.remove('hidden');
+            noticeCard.classList.remove('hidden');
+        }
+
+        // Hide notice
+        function hideNotice() {
+            noticeBanner.classList.add('hidden');
+            noticeCard.classList.add('hidden');
         }
 
         // Populate exam routine
@@ -316,15 +475,15 @@
                 });
                 
                 return `
-                    <div id="exam-${exam.code}" class="exam-card bg-white rounded-lg border border-gray-200 p-4">
+                    <div id="exam-${exam.code}" class="exam-card bg-white rounded-xl border border-gray-200 p-5 hover:border-blue-200">
                         <div class="flex justify-between items-start">
                             <div>
                                 <h4 class="font-bold text-gray-900">${exam.subject}</h4>
                                 <p class="text-sm text-gray-600 mt-1">${dateString}, ${exam.day}</p>
                             </div>
-                            <div>
-                                <span class="text-xs bg-blue-100 text-blue-800 py-1 px-2 rounded-full">কোড: ${exam.code}</span>
-                                <span id="countdown-${exam.code}" class="status-badge block mt-2 text-center"></span>
+                            <div class="text-right">
+                                <span class="inline-block bg-blue-100 text-blue-800 text-xs py-1 px-2 rounded-full mb-2">কোড: ${exam.code}</span>
+                                <span id="countdown-${exam.code}" class="status-badge block mt-1 text-center"></span>
                             </div>
                         </div>
                     </div>
@@ -413,13 +572,33 @@
             document.body.style.overflow = '';
         }
 
+        // Show toast notification
+        function showToast(message, type = 'success') {
+            toastMessage.textContent = message;
+            
+            // Set icon and color based on type
+            if (type === 'error') {
+                toast.className = 'fixed bottom-5 right-5 bg-red-600 text-white px-6 py-3 rounded-lg shadow-xl flex items-center z-50';
+                toastIcon.className = 'fas fa-exclamation-circle mr-3';
+            } else {
+                toast.className = 'fixed bottom-5 right-5 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-xl flex items-center z-50';
+                toastIcon.className = 'fas fa-check-circle mr-3';
+            }
+            
+            // Show toast
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
         // Handle download form submission
         async function handleDownloadSubmit() {
             const name = studentNameInput.value.trim();
             const roll = rollNumberInput.value.trim();
             
             if (!name || !roll) {
-                alert('দয়া করে আপনার নাম এবং রোল নম্বর প্রদান করুন।');
+                showToast('দয়া করে আপনার নাম এবং রোল নম্বর প্রদান করুন।', 'error');
                 return;
             }
             
@@ -454,7 +633,7 @@
                 }
             } catch (error) {
                 console.error("Error saving download record: ", error);
-                alert('ডাটা সেভ করতে সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করুন।');
+                showToast('ডাটা সেভ করতে সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করুন।', 'error');
             } finally {
                 // Reset button state
                 submitText.textContent = 'সাবমিট করুন';
@@ -469,6 +648,7 @@
         closeSyllabusBtn.addEventListener('click', closeModal);
         modalOverlay.addEventListener('click', closeModal);
         submitBtn.addEventListener('click', handleDownloadSubmit);
+        closeNoticeBtn.addEventListener('click', hideNotice);
 
         // Close modal when pressing Escape key
         document.addEventListener('keydown', (e) => {
