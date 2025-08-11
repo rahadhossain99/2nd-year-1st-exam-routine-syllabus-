@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>পরীক্ষার রুটিন ও সিলেবাস</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        body {
+            font-family: 'Noto Sans Bengali', sans-serif;
+            background-color: #f8fafc;
+        }
+        .exam-card {
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .exam-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .countdown-card {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        }
+        .download-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        .download-btn:hover {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        }
+        .modal-overlay {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+        .floating-btn {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+        }
+        .input-field {
+            transition: all 0.3s ease;
+        }
+        .input-field:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-blue-700 to-blue-600 text-white py-6 px-4 shadow-lg">
+        <div class="container mx-auto">
+            <div class="flex flex-col items-center text-center">
+                <h1 class="text-2xl md:text-3xl font-bold mb-1 animate__animated animate__fadeInDown">সরকারি শহীদ সিরাজুদ্দীন হোসেন মহাবিদ্যালয়</h1>
+                <p class="text-blue-100 mb-4 animate__animated animate__fadeInDown animate__delay-1s">খাজুরা, বাঘারপাড়া, যশোর</p>
+                <div class="bg-white text-blue-700 font-bold py-2 px-6 rounded-full inline-block animate__animated animate__zoomIn animate__delay-2s">
+                    <h2 class="text-lg md:text-xl">দ্বাদশ শ্রেণির ১ম সাময়িক পরীক্ষা</h2>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Column - Exam Routine -->
+            <div class="lg:col-span-2 space-y-6">
+                <div class="bg-white rounded-xl shadow-md overflow-hidden animate__animated animate__fadeInLeft">
+                    <div class="bg-blue-600 text-white px-6 py-4">
+                        <h3 class="text-xl font-bold">পরীক্ষার সময়সূচি</h3>
+                    </div>
+                    <div class="p-4 md:p-6">
+                        <div class="space-y-4">
+                            <div id="routine-body" class="space-y-3">
+                                <!-- Exams will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl shadow-lg p-5 animate__animated animate__fadeInLeft animate__delay-1s">
+                    <div class="flex items-start">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <div>
+                            <p class="font-bold">ফলাফল প্রকাশ:</p>
+                            <p id="result-date-text" class="text-green-100">২৫ সেপ্টেম্বর ২০২৫, বৃহস্পতিবার সকাল ১০:০০ টায়</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Countdown -->
+            <div class="space-y-6">
+                <div class="countdown-card text-white rounded-xl shadow-lg overflow-hidden animate__animated animate__fadeInRight">
+                    <div class="px-6 py-4 bg-blue-800 bg-opacity-50">
+                        <h3 id="countdown-title" class="text-xl font-bold">পরীক্ষার বাকি সময়</h3>
+                    </div>
+                    <div class="p-5">
+                        <div id="countdown-container" class="grid grid-cols-2 gap-4">
+                            <div class="bg-blue-800 bg-opacity-30 rounded-lg p-4 text-center backdrop-blur-sm">
+                                <div id="days" class="text-3xl font-bold">00</div>
+                                <div class="text-sm opacity-90">দিন</div>
+                            </div>
+                            <div class="bg-blue-800 bg-opacity-30 rounded-lg p-4 text-center backdrop-blur-sm">
+                                <div id="hours" class="text-3xl font-bold">00</div>
+                                <div class="text-sm opacity-90">ঘন্টা</div>
+                            </div>
+                            <div class="bg-blue-800 bg-opacity-30 rounded-lg p-4 text-center backdrop-blur-sm">
+                                <div id="minutes" class="text-3xl font-bold">00</div>
+                                <div class="text-sm opacity-90">মিনিট</div>
+                            </div>
+                            <div class="bg-blue-800 bg-opacity-30 rounded-lg p-4 text-center backdrop-blur-sm">
+                                <div id="seconds" class="text-3xl font-bold">00</div>
+                                <div class="text-sm opacity-90">সেকেন্ড</div>
+                            </div>
+                        </div>
+                        <div id="final-message" class="hidden mt-4 text-center text-lg font-bold animate__animated animate__bounceIn">
+                            সকল পরীক্ষা সম্পন্ন হয়েছে!
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Syllabus Download Card -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden animate__animated animate__fadeInRight animate__delay-1s">
+                    <div class="bg-indigo-600 text-white px-6 py-4">
+                        <h3 class="text-xl font-bold">পরীক্ষার সিলেবাস</h3>
+                    </div>
+                    <div class="p-6 text-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-indigo-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <p class="text-gray-600 mb-5">১ম সাময়িক পরীক্ষার সম্পূর্ণ সিলেবাস ডাউনলোড করুন</p>
+                        <button id="open-syllabus-btn" class="download-btn text-white font-bold py-3 px-8 rounded-lg inline-flex items-center transition-transform transform hover:scale-105">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            সিলেবাস ডাউনলোড
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Floating Action Button (Mobile) -->
+    <div class="fixed bottom-6 right-6 lg:hidden z-50">
+        <button id="mobile-download-btn" class="floating-btn bg-indigo-600 text-white p-4 rounded-full shadow-lg transition-transform transform hover:scale-110">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+        </button>
+    </div>
+
+    <!-- Syllabus Download Modal -->
+    <div id="syllabus-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <div id="modal-overlay" class="fixed inset-0 bg-black bg-opacity-50 modal-overlay animate__animated animate__fadeIn"></div>
+        
+        <div id="modal-container" class="bg-white rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto z-10 animate__animated animate__zoomIn">
+            <div class="sticky top-0 bg-indigo-600 text-white p-4 flex justify-between items-center">
+                <h3 class="text-xl font-bold">সিলেবাস ডাউনলোড</h3>
+                <button id="close-syllabus-btn" class="text-white hover:text-indigo-200 text-2xl font-bold">&times;</button>
+            </div>
+            <div class="p-6">
+                <!-- Message Box for displaying alerts -->
+                <div id="message-box" class="hidden mb-4 p-4 text-sm text-red-700 bg-red-100 rounded-lg" role="alert">
+                    <span class="font-medium"></span>
+                </div>
+
+                <div id="download-form">
+                    <div class="mb-5">
+                        <label for="student-name" class="block text-gray-700 font-medium mb-2">আপনার নাম</label>
+                        <input type="text" id="student-name" class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" placeholder="আপনার পুরো নাম লিখুন">
+                    </div>
+                    <div class="mb-6">
+                        <label for="roll-number" class="block text-gray-700 font-medium mb-2">রোল নম্বর</label>
+                        <input type="text" id="roll-number" class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" placeholder="আপনার রোল নম্বর লিখুন">
+                    </div>
+                    <button id="submit-btn" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center">
+                        <span id="submit-text">সাবমিট করুন</span>
+                        <svg id="submit-spinner" class="hidden animate-spin ml-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div id="download-section" class="hidden text-center pt-4">
+                    <div class="mb-6 p-4 bg-green-100 text-green-800 rounded-lg border border-green-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-green-500 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p class="font-bold">ধন্যবাদ!</p>
+                        <p id="student-info" class="mt-1"></p>
+                    </div>
+                    
+                    <div id="download-ready" class="hidden">
+                        <p class="mb-4 text-gray-700">নিচের বাটনে ক্লিক করে সিলেবাস ডাউনলোড করুন:</p>
+                        <a id="download-link" href="#" class="download-btn text-white font-bold py-3 px-8 rounded-lg inline-flex items-center justify-center transition-transform transform hover:scale-105 shadow-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            ডাউনলোড করুন
+                        </a>
+                    </div>
+                    
+                    <div id="no-link-message" class="p-4 bg-yellow-100 text-yellow-800 rounded-lg border border-yellow-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        ড্রাইভ লিংক এখনো যুক্ত করা হয়নি। দয়া করে কিছুক্ষণ পর আবার চেষ্টা করুন।
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs (v11.6.1) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, onSnapshot, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase Configuration and Initialization
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        
+        // Use custom auth token if available, otherwise sign in anonymously
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // --- DATA SETUP ---
+        const exams = [
+            { date: '2025-09-07T10:00:00', day: 'রবিবার', subject: 'ইংরেজি (আবশ্যিক) ২য় পত্র', code: '108' },
+            { date: '2025-09-08T10:00:00', day: 'সোমবার', subject: 'তথ্য ও যোগাযোগ প্রযুক্তি', code: '275' },
+            { date: '2025-09-09T10:00:00', day: 'মঙ্গলবার', subject: 'বাংলা (আবশ্যিক) ২য় পত্র', code: '102' },
+            { date: '2025-09-11T10:00:00', day: 'বৃহস্পতিবার', subject: 'পদার্থবিজ্ঞান ২য় পত্র', code: '175' },
+            { date: '2025-09-15T10:00:00', day: 'সোমবার', subject: 'রসায়ন ২য় পত্র', code: '177' },
+            { date: '2025-09-17T10:00:00', day: 'বুধবার', subject: 'জীববিজ্ঞান ২য় পত্র', code: '179' },
+            { date: '2025-09-18T10:00:00', day: 'বৃহস্পতিবার', subject: 'উচ্চতর গণিত ২য় পত্র', code: '178' }
+        ];
+        const resultDate = new Date('2025-09-25T10:00:00');
+        const EXAM_DURATION_HOURS = 3;
+
+        // --- DOM ELEMENTS ---
+        const routineBody = document.getElementById('routine-body');
+        const countdownTitle = document.getElementById('countdown-title');
+        const daysEl = document.getElementById('days');
+        const hoursEl = document.getElementById('hours');
+        const minutesEl = document.getElementById('minutes');
+        const secondsEl = document.getElementById('seconds');
+        const countdownContainer = document.getElementById('countdown-container');
+        const finalMessage = document.getElementById('final-message');
+        const openSyllabusBtn = document.getElementById('open-syllabus-btn');
+        const mobileDownloadBtn = document.getElementById('mobile-download-btn');
+        const syllabusModal = document.getElementById('syllabus-modal');
+        const modalOverlay = document.getElementById('modal-overlay');
+        const modalContainer = document.getElementById('modal-container');
+        const closeSyllabusBtn = document.getElementById('close-syllabus-btn');
+        const downloadForm = document.getElementById('download-form');
+        const downloadSection = document.getElementById('download-section');
+        const studentNameInput = document.getElementById('student-name');
+        const rollNumberInput = document.getElementById('roll-number');
+        const submitBtn = document.getElementById('submit-btn');
+        const submitText = document.getElementById('submit-text');
+        const submitSpinner = document.getElementById('submit-spinner');
+        const studentInfo = document.getElementById('student-info');
+        const downloadReady = document.getElementById('download-ready');
+        const downloadLink = document.getElementById('download-link');
+        const noLinkMessage = document.getElementById('no-link-message');
+        const messageBox = document.getElementById('message-box');
+
+        // --- STATE VARIABLES ---
+        let currentDriveLink = null;
+        let isAuthReady = false;
+
+        // --- FUNCTIONS ---
+        
+        // Initialize the app
+        async function initApp() {
+            populateRoutine();
+            
+            // Sign in with custom token or anonymously
+            if (initialAuthToken) {
+                try {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } catch (error) {
+                    console.error("Error signing in with custom token:", error);
+                    await signInAnonymously(auth);
+                }
+            } else {
+                await signInAnonymously(auth);
+            }
+            
+            onAuthStateChanged(auth, (user) => {
+                isAuthReady = true;
+                if (user) {
+                    // Load drive link after auth is ready
+                    loadDriveLink();
+                } else {
+                    // Handle unauthenticated state if necessary
+                    currentDriveLink = null;
+                }
+            });
+
+            // Start countdown timer
+            setInterval(updateStatus, 1000);
+            updateStatus();
+        }
+        
+        // Load drive link from Firestore
+        function loadDriveLink() {
+             const driveLinkRef = doc(db, "artifacts/default-app-id/public/data/settings/driveLink");
+             onSnapshot(driveLinkRef, (docSnap) => {
+                 if (docSnap.exists()) {
+                     currentDriveLink = docSnap.data().url;
+                 } else {
+                     currentDriveLink = null;
+                 }
+             });
+        }
+        
+        // Populate exam routine
+        function populateRoutine() {
+            routineBody.innerHTML = exams.map(exam => {
+                const examDate = new Date(exam.date);
+                const dateString = examDate.toLocaleDateString('bn-BD', { 
+                    day: '2-digit', 
+                    month: '2-digit', 
+                    year: 'numeric' 
+                });
+                
+                return `
+                    <div id="exam-${exam.code}" class="exam-card bg-white rounded-lg border border-gray-200 p-4">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-bold text-gray-900">${exam.subject}</h4>
+                                <p class="text-sm text-gray-600 mt-1">${dateString}, ${exam.day}</p>
+                            </div>
+                            <div>
+                                <span class="text-xs bg-blue-100 text-blue-800 py-1 px-2 rounded-full">কোড: ${exam.code}</span>
+                                <span id="countdown-${exam.code}" class="status-badge block mt-2 text-center"></span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Update exam status and countdowns
+        function updateStatus() {
+            const now = new Date();
+            
+            // Update individual exam status
+            exams.forEach(exam => {
+                const examDate = new Date(exam.date);
+                const examEndTime = new Date(examDate.getTime() + EXAM_DURATION_HOURS * 60 * 60 * 1000);
+                const countdownCell = document.getElementById(`countdown-${exam.code}`);
+                
+                if (!countdownCell) return;
+
+                const totalSeconds = (examDate - now) / 1000;
+
+                if (now > examEndTime) {
+                    countdownCell.className = 'status-badge bg-gray-100 text-gray-600';
+                    countdownCell.textContent = 'সম্পন্ন';
+                    document.getElementById(`exam-${exam.code}`).classList.add('opacity-70');
+                } else if (now >= examDate && now <= examEndTime) {
+                    countdownCell.className = 'status-badge bg-yellow-100 text-yellow-800 animate-pulse';
+                    countdownCell.textContent = 'চলছে';
+                } else {
+                    const daysLeft = Math.floor(totalSeconds / (60 * 60 * 24));
+                    const hoursLeft = Math.floor(totalSeconds / 3600) % 24;
+                    const minutesLeft = Math.floor(totalSeconds / 60) % 60;
+                    countdownCell.className = 'status-badge bg-blue-100 text-blue-800';
+                    let statusText = (daysLeft > 0) ? `${daysLeft} দিন বাকি` : 
+                                    (hoursLeft > 0) ? `${hoursLeft} ঘন্টা বাকি` : 
+                                    `${minutesLeft} মিনিট বাকি`;
+                    countdownCell.textContent = statusText;
+                }
+            });
+
+            // Update main countdown
+            const nextExam = exams.find(exam => new Date(exam.date) > now);
+            let targetDate = nextExam ? new Date(nextExam.date) : resultDate;
+            let targetTitle = nextExam ? `${nextExam.subject} পরীক্ষা` : 'ফলাফল প্রকাশ';
+            
+            countdownTitle.textContent = `${targetTitle} এর বাকি সময়`;
+            const totalSeconds = (targetDate - now) / 1000;
+
+            if (totalSeconds > 0) {
+                daysEl.textContent = String(Math.floor(totalSeconds / 3600 / 24)).padStart(2, '0');
+                hoursEl.textContent = String(Math.floor(totalSeconds / 3600) % 24).padStart(2, '0');
+                minutesEl.textContent = String(Math.floor(totalSeconds / 60) % 60).padStart(2, '0');
+                secondsEl.textContent = String(Math.floor(totalSeconds) % 60).padStart(2, '0');
+                
+                countdownContainer.classList.remove('hidden');
+                finalMessage.classList.add('hidden');
+            } else {
+                if (now > resultDate) {
+                    countdownContainer.classList.add('hidden');
+                    finalMessage.classList.remove('hidden');
+                    countdownTitle.textContent = 'সমস্ত প্রক্রিয়া সম্পন্ন';
+                } else {
+                    ['days', 'hours', 'minutes', 'seconds'].forEach(id => {
+                        document.getElementById(id).textContent = '00';
+                    });
+                }
+            }
+        }
+
+        // Open syllabus modal
+        function openModal() {
+            syllabusModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            
+            // Reset form and message box
+            downloadForm.classList.remove('hidden');
+            downloadSection.classList.add('hidden');
+            messageBox.classList.add('hidden');
+            messageBox.querySelector('span').textContent = '';
+            studentNameInput.value = '';
+            rollNumberInput.value = '';
+            studentNameInput.focus();
+        }
+
+        // Show a custom message box
+        function showMessage(message, isError = true) {
+            messageBox.querySelector('span').textContent = message;
+            messageBox.classList.remove('hidden');
+            if (isError) {
+                messageBox.classList.add('bg-red-100', 'text-red-700');
+                messageBox.classList.remove('bg-green-100', 'text-green-700');
+            } else {
+                messageBox.classList.add('bg-green-100', 'text-green-700');
+                messageBox.classList.remove('bg-red-100', 'text-red-700');
+            }
+        }
+
+        // Close syllabus modal
+        function closeModal() {
+            syllabusModal.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        // Handle download form submission
+        async function handleDownloadSubmit() {
+            const name = studentNameInput.value.trim();
+            const roll = rollNumberInput.value.trim();
+            
+            if (!name || !roll) {
+                showMessage('দয়া করে আপনার নাম এবং রোল নম্বর প্রদান করুন।', true);
+                return;
+            }
+            
+            // Show loading state
+            submitText.textContent = 'প্রক্রিয়াকরণ...';
+            submitSpinner.classList.remove('hidden');
+            submitBtn.disabled = true;
+            
+            // Check if auth is ready before proceeding
+            if (!isAuthReady) {
+                 showMessage('প্রস্তুতি চলছে, দয়া করে আবার চেষ্টা করুন।', true);
+                 submitBtn.disabled = false;
+                 submitText.textContent = 'সাবমিট করুন';
+                 return;
+            }
+
+            try {
+                // Save download record to Firestore
+                const downloadStatsRef = collection(db, "artifacts/default-app-id/public/data/downloadStats");
+                await addDoc(downloadStatsRef, {
+                    name,
+                    roll,
+                    firstDownload: new Date().toISOString(),
+                    lastDownload: new Date().toISOString(),
+                    downloadCount: 1
+                });
+                
+                // Show download section
+                studentInfo.textContent = `${name} (রোল: ${roll})`;
+                downloadForm.classList.add('hidden');
+                downloadSection.classList.remove('hidden');
+                
+                // Update download link if available
+                if (currentDriveLink) {
+                    downloadLink.href = currentDriveLink;
+                    downloadReady.classList.remove('hidden');
+                    noLinkMessage.classList.add('hidden');
+                } else {
+                    downloadReady.classList.add('hidden');
+                    noLinkMessage.classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error("Error saving download record: ", error);
+                showMessage('ডাটা সেভ করতে সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করুন।', true);
+            } finally {
+                // Reset button state
+                submitText.textContent = 'সাবমিট করুন';
+                submitSpinner.classList.add('hidden');
+                submitBtn.disabled = false;
+            }
+        }
+
+        // --- EVENT LISTENERS ---
+        openSyllabusBtn.addEventListener('click', openModal);
+        mobileDownloadBtn.addEventListener('click', openModal);
+        closeSyllabusBtn.addEventListener('click', closeModal);
+        modalOverlay.addEventListener('click', closeModal);
+        submitBtn.addEventListener('click', handleDownloadSubmit);
+
+        // Close modal when pressing Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !syllabusModal.classList.contains('hidden')) {
+                closeModal();
+            }
+        });
+
+        // Initialize the app when DOM is loaded
+        window.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
