@@ -38,6 +38,8 @@
                         'fade-in': 'fadeIn 0.5s ease-in-out',
                         'slide-up': 'slideUp 0.5s ease-out',
                         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'glow': 'glow 1.5s infinite alternate',
+                        'gradient-text': 'gradient-text 5s ease infinite',
                     },
                     keyframes: {
                         fadeIn: {
@@ -47,6 +49,26 @@
                         slideUp: {
                             '0%': { transform: 'translateY(20px)', opacity: '0' },
                             '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        glow: {
+                            '0%, 100%': {
+                                'text-shadow': '0 0 5px #fff, 0 0 10px #0ea5e9, 0 0 15px #3b82f6',
+                                'color': '#0ea5e9',
+                            },
+                            '50%': {
+                                'text-shadow': '0 0 10px #fff, 0 0 20px #3b82f6, 0 0 30px #1d4ed8',
+                                'color': '#3b82f6',
+                            }
+                        },
+                        'gradient-text': {
+                            '0%, 100%': {
+                                'background-size': '200% 200%',
+                                'background-position': 'left center',
+                            },
+                            '50%': {
+                                'background-size': '200% 200%',
+                                'background-position': 'right center',
+                            }
                         }
                     }
                 }
@@ -124,9 +146,17 @@
         #toast {
             transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
+        .rahathossain-copyright {
+            background-image: linear-gradient(to right, #0ea5e9, #6366f1, #0ea5e9);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+            animation: gradient-text 5s ease infinite;
+        }
     </style>
 </head>
-<body class="min-h-screen">
+<body class="min-h-screen flex flex-col">
     <!-- Notice Banner (if exists) -->
     <div id="notice-banner" class="hidden bg-red-600 text-white py-3 px-4">
         <div class="container mx-auto flex items-center justify-between">
@@ -161,7 +191,7 @@
     </header>
 
     <!-- Main Content -->
-    <main class="container mx-auto px-4 py-8">
+    <main class="container mx-auto px-4 py-8 flex-grow">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Left Column - Exam Routine -->
             <div class="lg:col-span-2 space-y-6">
@@ -314,7 +344,7 @@
                     </div>
                     
                     <div id="download-ready" class="hidden animate__animated animate__fadeIn">
-                        <p class="mb-4 text-gray-700">নিচের বাটনে ক্লিক করে সিলেবাস ডাউনলোড করুন:</p>
+                        <p class="mb-4 text-gray-700 font-bold">এখন ডাউনলোড করতে পারেন, লিংক যুক্ত করা হয়েছে।</p>
                         <a id="download-link" href="#" class="download-btn text-white font-bold py-3 px-8 rounded-lg inline-flex items-center justify-center shadow-lg hover:shadow-xl">
                             <i class="fas fa-file-download mr-2"></i>
                             ডাউনলোড করুন
@@ -324,7 +354,7 @@
                     <div id="no-link-message" class="p-4 bg-yellow-50 text-yellow-800 rounded-lg border border-yellow-200 animate__animated animate__fadeIn">
                         <div class="flex items-center justify-center">
                             <i class="fas fa-exclamation-triangle mr-2"></i>
-                            <p>ড্রাইভ লিংক এখনো যুক্ত করা হয়নি। দয়া করে কিছুক্ষণ পর আবার চেষ্টা করুন।</p>
+                            <p>ড্রাইভ লিংক এখনো যুক্ত করা হয়নি। খুব শীঘ্রই যুক্ত করা হবে।</p>
                         </div>
                     </div>
                 </div>
@@ -337,6 +367,13 @@
         <i id="toast-icon" class="fas fa-check-circle mr-3"></i>
         <p id="toast-message"></p>
     </div>
+
+    <!-- Footer with Copyright -->
+    <footer class="bg-gray-100 text-gray-500 text-center py-4 mt-8 shadow-inner">
+        <div class="container mx-auto">
+            <p class="text-sm">© <span class="rahathossain-copyright">RAHAT HOSSAIN</span></p>
+        </div>
+    </footer>
 
     <!-- Firebase Initialization -->
     <script>
@@ -623,7 +660,7 @@
                 downloadSection.classList.remove('hidden');
                 
                 // Update download link if available
-                if (currentDriveLink) {
+                if (currentDriveLink && currentDriveLink.trim() !== '') {
                     downloadLink.href = currentDriveLink;
                     downloadReady.classList.remove('hidden');
                     noLinkMessage.classList.add('hidden');
