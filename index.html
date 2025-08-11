@@ -6,6 +6,10 @@
     <title>পরীক্ষার রুটিন ও সিলেবাস</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;700&display=swap" rel="stylesheet">
     <!-- Animate.css -->
@@ -171,11 +175,6 @@
                 <button id="close-syllabus-btn" class="text-white hover:text-indigo-200 text-2xl font-bold">&times;</button>
             </div>
             <div class="p-6">
-                <!-- Message Box for displaying alerts -->
-                <div id="message-box" class="hidden mb-4 p-4 text-sm text-red-700 bg-red-100 rounded-lg" role="alert">
-                    <span class="font-medium"></span>
-                </div>
-
                 <div id="download-form">
                     <div class="mb-5">
                         <label for="student-name" class="block text-gray-700 font-medium mb-2">আপনার নাম</label>
@@ -224,21 +223,25 @@
         </div>
     </div>
 
-    <!-- Firebase SDKs (v11.6.1) -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, onSnapshot, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    <!-- Firebase Initialization -->
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAyOg_9r6B2oEw5tyRhDYvz5KRCvknPNtE",
+            authDomain: "edtech-success-hub.firebaseapp.com",
+            projectId: "edtech-success-hub",
+            storageBucket: "edtech-success-hub.appspot.com",
+            messagingSenderId: "898562954156",
+            appId: "1:898562954156:web:852b093759df69ed7a2009"
+        };
 
-        // Firebase Configuration and Initialization
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-        
-        // Use custom auth token if available, otherwise sign in anonymously
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+    </script>
 
+    <!-- App Script -->
+    <script>
         // --- DATA SETUP ---
         const exams = [
             { date: '2025-09-07T10:00:00', day: 'রবিবার', subject: 'ইংরেজি (আবশ্যিক) ২য় পত্র', code: '108' },
@@ -278,58 +281,30 @@
         const downloadReady = document.getElementById('download-ready');
         const downloadLink = document.getElementById('download-link');
         const noLinkMessage = document.getElementById('no-link-message');
-        const messageBox = document.getElementById('message-box');
 
         // --- STATE VARIABLES ---
         let currentDriveLink = null;
-        let isAuthReady = false;
 
         // --- FUNCTIONS ---
         
         // Initialize the app
-        async function initApp() {
+        function initApp() {
             populateRoutine();
+            updateStatus();
             
-            // Sign in with custom token or anonymously
-            if (initialAuthToken) {
-                try {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } catch (error) {
-                    console.error("Error signing in with custom token:", error);
-                    await signInAnonymously(auth);
-                }
-            } else {
-                await signInAnonymously(auth);
-            }
-            
-            onAuthStateChanged(auth, (user) => {
-                isAuthReady = true;
-                if (user) {
-                    // Load drive link after auth is ready
-                    loadDriveLink();
+            // Load drive link from Firestore
+            db.collection("settings").doc("driveLink").onSnapshot(doc => {
+                if (doc.exists) {
+                    currentDriveLink = doc.data().url;
                 } else {
-                    // Handle unauthenticated state if necessary
                     currentDriveLink = null;
                 }
             });
-
+            
             // Start countdown timer
             setInterval(updateStatus, 1000);
-            updateStatus();
         }
-        
-        // Load drive link from Firestore
-        function loadDriveLink() {
-             const driveLinkRef = doc(db, "artifacts/default-app-id/public/data/settings/driveLink");
-             onSnapshot(driveLinkRef, (docSnap) => {
-                 if (docSnap.exists()) {
-                     currentDriveLink = docSnap.data().url;
-                 } else {
-                     currentDriveLink = null;
-                 }
-             });
-        }
-        
+
         // Populate exam routine
         function populateRoutine() {
             routineBody.innerHTML = exams.map(exam => {
@@ -424,27 +399,12 @@
             syllabusModal.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
             
-            // Reset form and message box
+            // Reset form
             downloadForm.classList.remove('hidden');
             downloadSection.classList.add('hidden');
-            messageBox.classList.add('hidden');
-            messageBox.querySelector('span').textContent = '';
             studentNameInput.value = '';
             rollNumberInput.value = '';
             studentNameInput.focus();
-        }
-
-        // Show a custom message box
-        function showMessage(message, isError = true) {
-            messageBox.querySelector('span').textContent = message;
-            messageBox.classList.remove('hidden');
-            if (isError) {
-                messageBox.classList.add('bg-red-100', 'text-red-700');
-                messageBox.classList.remove('bg-green-100', 'text-green-700');
-            } else {
-                messageBox.classList.add('bg-green-100', 'text-green-700');
-                messageBox.classList.remove('bg-red-100', 'text-red-700');
-            }
         }
 
         // Close syllabus modal
@@ -459,7 +419,7 @@
             const roll = rollNumberInput.value.trim();
             
             if (!name || !roll) {
-                showMessage('দয়া করে আপনার নাম এবং রোল নম্বর প্রদান করুন।', true);
+                alert('দয়া করে আপনার নাম এবং রোল নম্বর প্রদান করুন।');
                 return;
             }
             
@@ -468,18 +428,9 @@
             submitSpinner.classList.remove('hidden');
             submitBtn.disabled = true;
             
-            // Check if auth is ready before proceeding
-            if (!isAuthReady) {
-                 showMessage('প্রস্তুতি চলছে, দয়া করে আবার চেষ্টা করুন।', true);
-                 submitBtn.disabled = false;
-                 submitText.textContent = 'সাবমিট করুন';
-                 return;
-            }
-
             try {
                 // Save download record to Firestore
-                const downloadStatsRef = collection(db, "artifacts/default-app-id/public/data/downloadStats");
-                await addDoc(downloadStatsRef, {
+                await db.collection("downloadStats").add({
                     name,
                     roll,
                     firstDownload: new Date().toISOString(),
@@ -503,7 +454,7 @@
                 }
             } catch (error) {
                 console.error("Error saving download record: ", error);
-                showMessage('ডাটা সেভ করতে সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করুন।', true);
+                alert('ডাটা সেভ করতে সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করুন।');
             } finally {
                 // Reset button state
                 submitText.textContent = 'সাবমিট করুন';
@@ -527,7 +478,7 @@
         });
 
         // Initialize the app when DOM is loaded
-        window.addEventListener('DOMContentLoaded', initApp);
+        document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
